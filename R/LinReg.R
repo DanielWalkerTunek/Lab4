@@ -76,3 +76,4 @@ linreg <- function(formula, data) {
   return(res)
 
 }
+
