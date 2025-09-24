@@ -14,6 +14,7 @@
 #' fit <- linreg_qr(Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
 #' summary(fit)
 
+
 linreg_qr <- function(formula, data) {
 
   # build model matrix X and response y
