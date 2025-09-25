@@ -1,0 +1,58 @@
+---
+title: "lab4"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lab4-intro}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# Overview
+
+This vignette shows how to fit and inspect a linear model using linreg() from Lab4.
+
+## Quick start
+```{r setup}
+library(Lab4)
+data(iris)
+
+fit <- linreg(Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
+```
+
+# Methods
+
+## print()
+```{r print}
+print(fit)
+```
+
+## plot()
+```{r plot}
+plot(fit)
+```
+
+## resid()
+```{r resid}
+resid(fit)
+```
+
+## pred()
+```{r pred}
+pred(fit)
+```
+
+## coef()
+```{r coef}
+coef(fit)
+```
+
+## summary()
+```{r summary}
+summary(fit)
+```
