@@ -25,6 +25,7 @@ NULL
 #' data(iris)
 #' fit <- linreg(Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
 #' summary(fit)
+
 linreg <- function(formula, data) {
   formula_str <- deparse(formula)
   data_name   <- deparse(substitute(data))
@@ -88,7 +89,9 @@ linreg <- function(formula, data) {
   res
 }
 
-# ---------- Methods ----------
+################################################################################
+# Methods
+################################################################################
 
 #' @export
 print.linreg <- function(x, ...) {
