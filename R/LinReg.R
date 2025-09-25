@@ -40,9 +40,16 @@ linreg <- function(formula, data) {
   n <- nrow(X)
   p <- ncol(X)
 
-  # OLS estimates beta_hat = (X'X)^(-1) X'y
-  XtX_inv <- solve(t(X) %*% X)
-  beta_hat <- XtX_inv %*% t(X) %*% y
+  # QR decomposition of X
+  # QR factorization
+  qrX <- qr(X)
+  # orthonormal Q
+  Q <- qr.Q(qrX)
+  # upper triangular R
+  R <- qr.R(qrX)
+
+  # estimate beta wwith QR
+  beta_hat <- solve(R, t(Q) %*% y)
 
   # fitted values and residuals
   y_hat <- X %*% beta_hat
@@ -54,8 +61,9 @@ linreg <- function(formula, data) {
   # residual variance
   sigma2 <- sum(residuals^2) / df
 
-  # variance-covariance of coefficients
-  var_beta <- as.numeric(sigma2) * XtX_inv
+  # VAR and CoVAR for beta using R
+  R_inv <- solve(R)
+  var_beta <- sigma2 * R_inv %*% t(R_inv)
 
   # t-values and p-values
   se_beta <- sqrt(diag(var_beta))
