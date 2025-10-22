@@ -41,13 +41,29 @@ linreg <- function(formula, data) {
   n <- nrow(X)
   p <- ncol(X)
 
-  # QR decomposition of X
-  # QR factorization
-  qrX <- qr(X)
-  # orthonormal Q
-  Q <- qr.Q(qrX)
-  # upper triangular R
-  R <- qr.R(qrX)
+  # QR decomposition manully inspierd by qr.-functions
+  # Orthonormal columns
+  Q <- matrix(0, n, p)
+  # Upper triangular
+  R <- matrix(0, p, p)
+
+  for (j in 1:p) {
+    v <- X[, j]
+    if (j > 1) {
+      for (i in 1:(j-1)) {
+
+        # projection coefficient
+        R[i, j] <- sum(Q[, i] * X[, j])
+
+        # remove projection
+        v <- v - R[i, j] * Q[, i]
+      }
+    }
+    R[j, j] <- sqrt(sum(v^2))
+
+    # normalize
+    Q[, j] <- v / R[j, j]
+  }
 
   # estimate beta wwith QR
   beta_hat <- solve(R, t(Q) %*% y)
