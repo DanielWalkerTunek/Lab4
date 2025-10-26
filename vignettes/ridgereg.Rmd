@@ -1,0 +1,135 @@
+---
+title: "ridgereg"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ridgereg}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+#' ---
+#' title: "Using ridgereg for Ridge Regression and Model Comparison"
+#' ---
+
+## Introduction
+
+In this vignette, we demonstrate how to use the `ridgereg()` function implemented
+in our package to perform ridge regression and compare its performance to
+ordinary least squares regression using the `caret` package.
+
+```{r}
+# the needed packages
+library(mlbench)
+library(caret)
+library(leaps)
+library(dplyr)
+library(ggplot2)
+library(Lab4)
+
+data("BostonHousing")
+
+```
+
+
+
+Split data into training-data and test-data:
+
+```{r}
+set.seed(42)
+train_index <- createDataPartition(BostonHousing$medv, p = 0.8, list = FALSE)
+train_data <- BostonHousing[train_index, ]
+test_data  <- BostonHousing[-train_index, ]
+
+```
+
+
+
+Now we do linear regression using caret:
+
+```{r}
+# a simple linear regression using caret
+lm_full <- train(
+  medv ~ ., 
+  data = train_data,
+  method = "lm",
+  trControl = trainControl(method = "none") 
+)
+
+# and a forward selection model
+lm_forward <- train(
+  medv ~ ., 
+  data = train_data,
+  method = "leapForward",
+  tuneGrid = data.frame(nvmax = 1:8), 
+  trControl = trainControl(method = "cv", number = 5)
+)
+
+summary(lm_forward$finalModel)
+
+
+```
+
+This confirms that the forward selection algorithm trained one model at each subset size (1, 2, 3, 4, 5, 6)
+
+Now we pick out the best forward selection model and evaluate:
+
+```{r}
+
+# get the best model out
+best_vars <- names(coef(lm_forward$finalModel, 6))[-1]
+formula_forward <- as.formula(paste("medv ~", paste(best_vars, collapse = " + ")))
+
+# refit as a standard lm model
+lm_forward_best <- lm(formula_forward, data = train_data)
+
+# evauate on train-data
+pred_train_forward <- stats::predict(lm_forward_best, newdata = train_data)
+rmse_forward_train <- sqrt(mean((train_data$medv - pred_train_forward)^2))
+r2_forward_train <- 1 - sum((train_data$medv - pred_train_forward)^2) / 
+                          sum((train_data$medv - mean(train_data$medv))^2)
+
+data.frame(
+  Model = "Forward Selection (6 predictors)",
+  RMSE = rmse_forward_train,
+  R2 = r2_forward_train
+)
+```
+
+The model explains about 71.4% of the variance in median home values in the training data and the predictions differ from the actual house values (*medv*) by about 4.83 units (thousands of dollars).
+
+Now we fit some ride regression models with *ridgereg()* from our package **Lab4**. Testing some diffrent $\lambda$ values.
+
+```{r}
+# ridge regression using ridgereg() from our Lab4 package
+ridge1 <- ridgereg(medv ~ ., data = train_data, lambda = 0.1)
+ridge2 <- ridgereg(medv ~ ., data = train_data, lambda = 1)
+ridge3 <- ridgereg(medv ~ ., data = train_data, lambda = 10)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
