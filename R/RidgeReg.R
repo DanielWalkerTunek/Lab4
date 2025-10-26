@@ -26,12 +26,17 @@ ridgereg <- function(formula, data, lambda) {
   formula_str <- deparse(formula)
   data_name   <- deparse(substitute(data))
 
-  if (!is.data.frame(data)) stop("`data` must be a data.frame")
+  data <- as.data.frame(data)
+  rownames(data) <- NULL
+
+  if (nrow(data) != length(data[[all.vars(formula)[1]]])) {
+    stop("Data and response length mismatch")
+  }
 
   # build model matrix X and response y
-  X <- model.matrix(formula, data = data)
-  y_name <- all.vars(formula)[1]
-  y <- data[[y_name]]
+  mf <- model.frame(formula, data = as.data.frame(data))
+  X  <- model.matrix(formula, mf)
+  y  <- model.response(mf)
 
   y_mean <- mean(y)
   y_scaled <- y - y_mean
@@ -121,28 +126,27 @@ print.ridgereg <- function(x, ...) {
   invisible(x)
 }
 
-#' Predicted values for a model
-#'
-#' Returns the predicted values from a model.
-#'
-#' @param object A model object.
-#' @param ... Arguments passed to methods.
-#' @export
-predict <- function(object, ...) UseMethod("predict")
 
 
-#' @rdname predict
-#' @param newdata A data frame for which to predict values.
+#' Predict method for ridgereg objects
+#'
+#' Returns predicted values for new data using a fitted ridgereg model.
+#'
+#' @param object A ridgereg model object.
+#' @param newdata Optional data frame for which to predict values.
+#' If omitted, the fitted values are returned.
+#' @param ... Additional arguments (not used).
+#'
+#' @return A numeric vector of predicted values.
 #' @export
+#' @method predict ridgereg
 predict.ridgereg <- function(object, newdata, ...) {
-
   if (missing(newdata)) {
     return(object$fitted.values)
   }
 
   X_new <- model.matrix(object$formula, data = newdata)
   y_pred <- X_new %*% object$coefficients
-
   return(as.vector(y_pred))
 }
 

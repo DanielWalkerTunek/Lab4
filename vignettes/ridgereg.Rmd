@@ -108,19 +108,91 @@ The model explains about 71.4% of the variance in median home values in the trai
 Now we fit some ride regression models with *ridgereg()* from our package **Lab4**. Testing some diffrent $\lambda$ values.
 
 ```{r}
-# ridge regression using ridgereg() from our Lab4 package
-ridge1 <- ridgereg(medv ~ ., data = train_data, lambda = 0.1)
-ridge2 <- ridgereg(medv ~ ., data = train_data, lambda = 1)
-ridge3 <- ridgereg(medv ~ ., data = train_data, lambda = 10)
+
+set.seed(42)
+
+lambdas <- c(0.01, 0.1, 1, 10)
+
+# 10 folds
+k <- 10
+folds <- sample(rep(1:k, length.out = nrow(train_data)))
+
+cv_results <- data.frame(lambda = lambdas, RMSE = NA)
+
+# cross-validation
+for (i in seq_along(lambdas)) {
+  lambda_i <- lambdas[i]
+  fold_rmse <- numeric(k)
+  
+  for (fold in 1:k) {
+    train_fold <- train_data[folds != fold, ]
+    valid_fold <- train_data[folds == fold, ]
+    
+
+    model_i <- ridgereg(medv ~ ., data = train_fold, lambda = lambda_i)
+    
+    # preds
+    preds <- predict(model_i, newdata = valid_fold)
+    
+    # RMSE for this fold
+    rmse <- sqrt(mean((valid_fold$medv - preds)^2))
+    fold_rmse[fold] <- rmse
+  }
+  
+  # Average RMSE 
+  cv_results$RMSE[i] <- mean(fold_rmse)
+}
+
+print(cv_results)
+best_lambda <- cv_results$lambda[which.min(cv_results$RMSE)]
+cat("Best lambda:", best_lambda, "\n")
+
+# save it
+ridge_best <- ridgereg(medv ~ ., data = train_data, lambda = best_lambda)
+
 ```
 
 
 
 
+Now we compare the three models:
+
+```{r}
+
+rmse <- function(actual, predicted) {
+  sqrt(mean((actual - predicted)^2))
+}
 
 
+pred_full <- predict(lm_full, newdata = test_data)
+pred_forward <- predict(lm_forward_best, newdata = test_data)
+pred_ridge <- predict(ridge_best, newdata = test_data)
+
+r2 <- function(actual, predicted) {
+  cor(actual, predicted)^2
+}
 
 
+results <- data.frame(
+  Model = c("Full Linear Model", "Forward Selection", "Ridge Regression"),
+  RMSE = c(
+    rmse(test_data$medv, pred_full),
+    rmse(test_data$medv, pred_forward),
+    rmse(test_data$medv, pred_ridge)
+  ),
+  R2 = c(
+    r2(test_data$medv, pred_full),
+    r2(test_data$medv, pred_forward),
+    r2(test_data$medv, pred_ridge)
+  )
+)
+
+print(results)
+
+```
+
+
+The Ridge regression with $\lambda$ = 1 is the best choice for our data. It has comparable predictive performance to the full OLS model while offering better coefficient stability and generalization.
 
 
 

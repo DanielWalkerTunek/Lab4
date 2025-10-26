@@ -24,10 +24,10 @@
 #' @export
 
 visualize_airport_delays <- function() {
-  flights %>%
+  nycflights13::flights %>%
     dplyr::group_by(dest) %>%
     dplyr::summarise(mean_delay = mean(arr_delay, na.rm = TRUE)) %>%
-    dplyr::inner_join(airports, by = c("dest" = "faa")) %>%
+    dplyr::inner_join(nycflights13::airports, by = c("dest" = "faa")) %>%
     ggplot2::ggplot(ggplot2::aes(x = lon, y = lat, color = mean_delay)) +
     ggplot2::geom_point(size = 3) +
     ggplot2::scale_color_viridis_c(option = "plasma") +
@@ -39,6 +39,4 @@ visualize_airport_delays <- function() {
     ) +
     ggplot2::theme_minimal()
 }
-
-
 

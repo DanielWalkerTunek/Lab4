@@ -1,6 +1,6 @@
 Package: Lab4
 Type: Package
-Title: Linear regression model
+Title: Linear Regression Models
 Version: 1.0
 Authors@R: c(
     person(
@@ -10,19 +10,31 @@ Authors@R: c(
     ),
     person(
       "Sebastián", "Jofré",
-      email= "sebjo036@student.liu.se",
-      role = c("aut")
+      email = "sebjo036@student.liu.se",
+      role = "aut"
     )
   )
-Description: Provide a function that fits a multiple linear regression model using ordinary least squares.
+Description: Provides functions that fit multiple linear regression 
+    models using ordinary least squares, forward selection, and ridge regularization.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/DanielWalkerTunek/Lab4
 BugReports: https://github.com/DanielWalkerTunek/Lab4/issues
-Imports: stats, graphics
+Imports: 
+    stats,
+    graphics,
+    dplyr,
+    ggplot2,
+    nycflights13
 Suggests: 
-    testthat (>= 3.0.0), ggplot2, knitr, rmarkdown, MASS
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    MASS,
+    caret,
+    leaps,
+    mlbench
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 RoxygenNote: 7.3.3
