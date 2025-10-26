@@ -5,7 +5,7 @@
 [![R-CMD-check](https://github.com/DanielWalkerTunek/Lab4/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DanielWalkerTunek/Lab4/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of Lab4 is to implement a Linear regression model
+The goal of Lab4 is to implement a Linear regression model. It also contains the material for the bonus lab.
 
 ## Installation
 
