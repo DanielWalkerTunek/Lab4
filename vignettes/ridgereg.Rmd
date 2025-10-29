@@ -10,20 +10,23 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 5,
+  fig.align = "center",
+  dpi = 150
 )
 ```
 
 
-#' ---
-#' title: "Using ridgereg for Ridge Regression and Model Comparison"
-#' ---
 
-## Introduction
+
+**Introduction**
 
 In this vignette, we demonstrate how to use the `ridgereg()` function implemented
 in our package to perform ridge regression and compare its performance to
-ordinary least squares regression using the `caret` package.
+ordinary least squares regression using the `caret` package. This vignette also 
+shows **mean_flight_delays** trough the function *visualize_airport_delays()*.
 
 ```{r}
 # the needed packages
@@ -32,6 +35,7 @@ library(caret)
 library(leaps)
 library(dplyr)
 library(ggplot2)
+library(nycflights13)
 library(Lab4)
 
 data("BostonHousing")
@@ -39,6 +43,7 @@ data("BostonHousing")
 ```
 
 
+# ridgereg
 
 Split data into training-data and test-data:
 
@@ -139,7 +144,6 @@ for (i in seq_along(lambdas)) {
     fold_rmse[fold] <- rmse
   }
   
-  # Average RMSE 
   cv_results$RMSE[i] <- mean(fold_rmse)
 }
 
@@ -196,11 +200,19 @@ The Ridge regression with $\lambda$ = 1 is the best choice for our data. It has 
 
 
 
+# Mean_flight_delays
 
+To show the function *visualize_airport_delays()* we just run the function:
 
+```{r}
 
+visualize_airport_delays()
+```
 
-
+The function creates an **ggplot2** output where each point represents an airport’s 
+location based on latitude and longitude. The color scale shows the average arrival 
+delay in minutes, warmer colors indicate longer delays, while cooler colors indicate 
+shorter or early arrivals.
 
 
 
